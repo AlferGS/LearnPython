@@ -1,0 +1,24 @@
+{
+    "university": {
+        "name": "Технический университет",
+        "founded": 1995,
+        "departments": [
+            {
+                "id": "CS",
+                "name": "Информатика",
+                "students_count": 3
+            },
+            {
+                "id": "MATH",
+                "name": "Математика",
+                "students_count": 2
+            },
+            {
+                "id": "PHY",
+                "name": "Физика",
+                "students_count": 1
+            }
+        ],
+        "total_student_count": 6
+    }
+}
