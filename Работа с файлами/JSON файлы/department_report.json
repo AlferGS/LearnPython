@@ -1,0 +1,36 @@
+{
+    "departments": [
+        {
+            "id": "CS",
+            "name": "Информатика",
+            "student_count": 3,
+            "avg_score": 78.4,
+            "best_grade": "Алгоритмы",
+            "worst_grade": "Алгоритмы",
+            "best_students": [
+                "Анна Смирнова"
+            ]
+        },
+        {
+            "id": "MATH",
+            "name": "Математика",
+            "student_count": 2,
+            "avg_score": 90.3,
+            "best_grade": "Математический анализ",
+            "worst_grade": "Математический анализ",
+            "best_students": [
+                "Виктория Лебедева",
+                "Дарья Новикова"
+            ]
+        },
+        {
+            "id": "PHY",
+            "name": "Физика",
+            "student_count": 1,
+            "avg_score": 61.3,
+            "best_grade": "Механика",
+            "worst_grade": "Электродинамика",
+            "best_students": []
+        }
+    ]
+}

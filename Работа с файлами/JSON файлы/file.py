@@ -123,12 +123,63 @@ for student in result:
 #   1) Название факультета
 #   2) Количество студентов
 #   3) Средний балл по факультету (по всем предметам всех студентов)
-#   4) Лучший предмет на факультете (с наибольшим средним баллом)
+#   4) Лучший предмет на факультете (с наибольшим баллом)
 #   5) Худший предмет на факультете
 #   6) Список отличников (средний балл >= 85)
 #
 # Результат сохраните в файл department_report.json.
 
+
+def task_3():
+    result_data = {"departments": []}
+    with open("university.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+        for department in data["university"]["departments"]:
+            student_list = [
+                student
+                for student in data["students"]
+                if student["department"] == department["id"]
+            ]
+            total_score = 0
+            min_score, max_score = 100, 0
+            min_score_name = max_score_name = ""
+            for student in student_list:
+                grade_score = 0
+                for grade in student["grades"]:
+                    if grade["score"] > max_score:
+                        max_score = grade["score"]
+                        max_score_name = grade["subject"]
+                    if grade["score"] < min_score:
+                        min_score = grade["score"]
+                        min_score_name = grade["subject"]
+                    grade_score += grade["score"]
+                total_score += grade_score / len(student["grades"])
+
+            department_stats = dict()
+            department_stats["id"] = department["id"]
+            department_stats["name"] = department["name"]
+            department_stats["student_count"] = len(student_list)
+            department_stats["avg_score"] = round(
+                total_score / len(student_list), 1
+            )
+            department_stats["best_grade"] = max_score_name
+            department_stats["worst_grade"] = min_score_name
+            department_stats["best_students"] = [
+                student["name"]
+                for student in student_list
+                if sum(grade["score"] for grade in student["grades"])
+                / len(student["grades"])
+                >= 85
+            ]
+            result_data["departments"].append(department_stats)
+
+    with open("department_report.json", "w", encoding="utf-8") as file:
+        json.dump(result_data, file, indent=4, ensure_ascii=False)
+
+    return result_data
+
+
+task_3()
 
 # %% 📚 Задача 4: Добавление и обновление данных
 
@@ -139,6 +190,121 @@ for student in result:
 #
 # Все изменения должны сохраняться в файл.
 
+
+def copy_in_file(filename, new_filename):
+    with open(filename, "r", encoding="utf-8") as inp_file:
+        with open(new_filename, "w", encoding="utf-8") as out_file:
+            json.dump(
+                json.load(inp_file), out_file, indent=4, ensure_ascii=False
+            )
+    pass
+
+
+def add_student(student_data):
+    data = dict()
+    with open("university_copy.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    if len(data["students"]) > 0:
+        student_data = {"id": data["students"][-1]["id"] + 1, **student_data}
+    else:
+        student_data = {"id": 1, **student_data}
+
+    data["students"].append(student_data)
+
+    with open("university_copy.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
+    pass
+
+
+def update_student_grades(student_id, new_grades):
+    data = dict()
+    flag = False
+    with open("university_copy.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    for student in data["students"]:
+        if student["id"] == student_id:
+            student["grades"] = new_grades
+            flag = True
+            break
+
+    with open("university_copy.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
+    print(
+        "Incorrect student_id. Student not found."
+        if flag == False
+        else "Student grades were updated."
+    )
+
+    pass
+
+
+def delete_student(student_id):
+    data = dict()
+    with open("university_copy.json", "r", encoding="utf-8") as file:
+        data = json.load(file)
+
+    student_list = list()
+    for student in data["students"]:
+        if student["id"] != student_id:
+            student_list.append(student)
+
+    data["students"] = student_list
+
+    with open("university_copy.json", "w", encoding="utf-8") as file:
+        json.dump(data, file, indent=4, ensure_ascii=False)
+
+    pass
+
+
+def task_4():
+    copy_in_file("university.json", "university_copy.json")
+    student_data = {
+        "name": "Петр Гланц",
+        "age": 22,
+        "department": "MATH",
+        "year": 3,
+        "grades": [
+            {
+                "subject": "Математический анализ",
+                "score": 88,
+                "date": "2025-01-17",
+            },
+            {"subject": "Линейная алгебра", "score": 81, "date": "2025-01-21"},
+            {
+                "subject": "Дискретная математика",
+                "score": 93,
+                "date": "2025-01-24",
+            },
+        ],
+    }
+    new_grades = [
+        {
+            "subject": "Математический анализ",
+            "score": 91,
+            "date": "2025-01-13",
+        },
+        {"subject": "Линейная алгебра", "score": 88, "date": "2025-01-23"},
+        {
+            "subject": "Дифференциальные уравнения",
+            "score": 71,
+            "date": "2025-02-01",
+        },
+    ]
+
+    add_student(student_data)
+
+    update_student_grades(3, new_grades)
+
+    delete_student(6)
+
+    pass
+
+
+task_4()
 
 # %% 📚 Задача 5: Анализ динамики успеваемости
 
