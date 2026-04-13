@@ -192,6 +192,7 @@ task_3()
 
 
 def copy_in_file(filename, new_filename):
+    """Create copy of file in new file"""
     with open(filename, "r", encoding="utf-8") as inp_file:
         with open(new_filename, "w", encoding="utf-8") as out_file:
             json.dump(
@@ -201,6 +202,10 @@ def copy_in_file(filename, new_filename):
 
 
 def add_student(student_data):
+    """Add student_data to "university_copy.json".
+    Add "id" to new student_data, and upload to file in "students" list
+    Result dump in file.
+    """
     data = dict()
     with open("university_copy.json", "r", encoding="utf-8") as file:
         data = json.load(file)
@@ -219,6 +224,9 @@ def add_student(student_data):
 
 
 def update_student_grades(student_id, new_grades):
+    """Search student in "students" list by "id" and change "grades" list
+    for the student object. Result dump in file.
+    """
     data = dict()
     flag = False
     with open("university_copy.json", "r", encoding="utf-8") as file:
@@ -243,6 +251,9 @@ def update_student_grades(student_id, new_grades):
 
 
 def delete_student(student_id):
+    """Search student in "students" list by "id" and delete it from list.
+    Result dump in file.
+    """
     data = dict()
     with open("university_copy.json", "r", encoding="utf-8") as file:
         data = json.load(file)
@@ -306,41 +317,100 @@ def task_4():
 
 task_4()
 
-# %% 📚 Задача 5: Анализ динамики успеваемости
-
-# Создайте функцию, которая анализирует динамику оценок.
-# Для каждого студента определите:
-#   1) Улучшил ли он успеваемость (средний балл последних двух оценок выше первых двух)
-#   2) Какие предметы имеют тенденцию к улучшению/ухудшению
-#
-# Результат должен быть сохранен в performance_analysis.json.
-
-
-# %% 📚 Задача 6: Экспорт в различные форматы
+# %% 📚 Задача 5: Экспорт в различные форматы
 
 # Создайте функции для экспорта данных:
 # export_to_csv() — экспортирует список студентов с их средними баллами в CSV
-# export_to_json_compact() — экспортирует минифицированную версию исходного JSON
-# export_summary_txt() — создает текстовый отчет в читаемом формате
+# export_to_txt() — создает текстовый отчет в читаемом формате
 
 
-# %% 📚 Задача 7: Валидация и очистка данных
+def export_to_csv():
+    """
+    Export "students" list from JSON file to CSV.
 
-# Создайте функцию, которая проверяет целостность данных и исправляет ошибки:
-# Проверки:
-#   a) У всех студентов должны быть заполнены все поля
-#   b) Оценки должны быть в диапазоне 0-100
-#   c) Дата должна быть в формате YYYY-MM-DD
-#   d) id должны быть уникальными
-#
-# Если найдены ошибки, функция должна:
-#   a) Вывести предупреждения
-#   b) Исправить автоматически (если возможно)
-#
-# Создать файл validation_report.json с отчетом об ошибках
+    Returns
+    -------
+    None
+    """
+    import csv
+
+    with open("university.json", "r", encoding="utf-8") as json_file:
+        data = json.load(json_file)
+        fieldnames = list()
+
+        if data["students"]:
+            fieldnames = data["students"][0].keys()
+        else:
+            return "'students' are empty"
+
+        with open(
+            "students_csv.csv", "w", newline="", encoding="utf-8"
+        ) as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+            for student in data["students"]:
+                writer.writerow(student)
+
+    with open("students_csv.csv", "r", encoding="utf-8") as csv_file:
+        reader = csv.DictReader(csv_file)
+        for row in reader:
+            print(*row.values())
+
+    pass
 
 
-# %% 📚 Задача 8: Слияние данных из нескольких источников
+def export_to_txt():
+    """
+    Export "students" list from JSON file to summary TXT.
+
+    Returns
+    -------
+    None
+    """
+    with open("university.json", "r", encoding="utf-8") as json_file:
+        data = json.load(json_file)
+
+        if not data["students"]:
+            return "'students' are empty"
+
+        with open(
+            "students_txt.txt", "w", newline="", encoding="utf-8"
+        ) as txt_file:
+            txt_file.write("Students:\n")
+
+            for student in data["students"]:
+                txt_file.write(f"""\nid - {student["id"]}
+name - {student["name"]}
+age - {student["age"]}
+department - {student["department"]}
+year - {student["year"]}
+grades:
+""")
+                for grade in student["grades"]:
+                    txt_file.write(f"""\tsubject - {grade["subject"]}
+\tscore - {grade["score"]}
+\tdate - {grade["date"]}
+""")
+
+    with open("students_txt.txt", "r", encoding="utf-8") as txt_file:
+        for line in txt_file:
+            print(line)
+
+    pass
+
+
+def task_5():
+    print("task_5:\nexport_to_csv")
+    export_to_csv()
+    print("export_to_txt")
+    export_to_txt()
+    pass
+
+
+task_5()
+
+# %% 📚 Задача 6: Слияние данных из нескольких источников
 
 # Создайте функцию, которая объединяет данные из двух JSON файлов:
 # Допустим, есть второй файл new_students.json с новыми студентами и
@@ -349,61 +419,3 @@ task_4()
 #   a) Если студент с таким id существует — обновить его данные
 #   b) Если нет — добавить нового
 #   c) При конфликте данных приоритет у нового файла
-
-
-# %% 📚 Задача 9: Сложные запросы и агрегации
-
-# Создайте функцию для выполнения сложных запросов:
-# Функция принимает запрос в виде JSON:
-#
-# json
-# {
-#   "filter": {
-#     "department": "CS",
-#     "age": {"min": 19, "max": 21},
-#     "year": [2, 3]
-#   },
-#   "aggregate": {
-#     "group_by": "year",
-#     "metrics": ["count", "avg_score", "max_score"]
-#   },
-#   "sort_by": "avg_score",
-#   "order": "desc"
-# }
-# Должна возвращать результат, соответствующий запросу.
-
-
-# %% 📚 Задача 10: Полный цикл обработки данных
-
-# Создайте комплексную программу, которая:
-# 1) Загружает данные из university.json
-# 2) Выполняет валидацию и очистку
-# 3) Добавляет нового студента (ввод данных через консоль)
-# 4) Обновляет оценки существующего студента
-# 5) Генерирует полный отчет по университету:
-#    a) Статистика по факультетам
-#    b) Рейтинг студентов
-#    c) Анализ успеваемости по годам
-#    d) Рекомендации по отчислению (студенты с средним баллом < 60)
-#    e) Сохраняет все отчеты в отдельную папку reports/
-#    f) Создает бэкап исходного JSON перед изменениями
-
-
-# %% ==========================================================================
-
-# # 📊 Критерии оценки
-# # Уровень	Задачи	Навыки
-# # Базовый	1-2	Чтение, загрузка, простая фильтрация
-# # Средний	3-5	Агрегация, модификация, обновление
-# # Продвинутый	6-8	Экспорт, валидация, слияние
-# # Экспертный	9-10	Сложные запросы, полный цикл обработки
-
-# # 💡 Советы
-# # Используйте json модуль — все задачи решаются им
-# # Создавайте вспомогательные функции для повторяющихся операций
-# # Обрабатывайте ошибки — файл может отсутствовать, данные могут быть некорректными
-# # Сохраняйте бэкапы перед изменениями (особенно в задаче 10)
-# # Пишите docstring для каждой функции
-
-# # Удачи в решении! 🎉
-# =============================================================================
