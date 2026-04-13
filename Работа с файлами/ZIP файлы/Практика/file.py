@@ -35,15 +35,19 @@ def task_1():
     with zipfile.ZipFile(
         "backup.zip", "w", compression=zipfile.ZIP_DEFLATED
     ) as archive:
-        # archive.write("test_folder")
-        # bad_files = archive.testzip()
-        # if bad_files:
-        # print(f"Damaged files: {bad_files}")
-
         here = os.path.dirname(os.path.abspath(__file__))
-        print(here)
-        print(os.listdir(here))
+        dir_path = os.path.abspath(here + "\\test_folder")
 
+        for root, dirs, files in os.walk(dir_path):
+            for file in files:
+                full_path = os.path.join(root, file)
+                arcname = os.path.relpath(full_path, start=dir_path)
+                print(full_path, arcname)
+                archive.write(full_path, arcname)
+            if not files and not dirs:
+                folder_arc = os.path.relpath(root, start=dir_path) + "/"
+                print(folder_arc)
+                archive.writestr(folder_arc, "")
     pass
 
 
